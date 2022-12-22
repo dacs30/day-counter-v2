@@ -11,6 +11,9 @@ import {
 } from '@fluentui/react';
 import { useConst } from '@fluentui/react-hooks';
 import { addDays } from '@fluentui/react/lib/DateTimeUtilities';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
+
+initializeIcons(/* optional base url */);
 
 const datePickerStyles: Partial<IDatePickerStyles> = { root: { maxWidth: 300, marginTop: 15 } };
 
@@ -18,7 +21,7 @@ function App(props: any) {
   const [maxDate, setMaxDate] = useState<Date | undefined>(undefined);
   const [minDate, setMinDate] = useState<Date | undefined>(undefined);
   const [daysBetweenDates, setDaysBetweenDates] = useState<number | undefined>(undefined);
-
+  const [mobileDevice, setMobileDevice] = useState<boolean | undefined>(undefined);
 
   const setMaxDateHandler = (date: Date | null | undefined) => {
     // set max date to date minus 1 day
@@ -52,6 +55,14 @@ function App(props: any) {
     if (maxDate && minDate) {
       setDaysBetweenDates(daysBetween(addDays(maxDate, 1), addDays(minDate, -1)));
     }
+
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      // true for mobile device
+      setMobileDevice(true);
+    } else {
+      // false for not mobile device
+      setMobileDevice(false);
+    }
   }, [maxDate, minDate]);
 
 
@@ -72,7 +83,7 @@ function App(props: any) {
           ariaLabel="Select a date"
           maxDate={maxDate ?? undefined}
           onSelectDate={setMinDateHandler}
-          allowTextInput
+          {...(mobileDevice ? { allowTextInput: false } : { allowTextInput: true })} 
           strings={strings}
         />
         <DatePicker
@@ -82,7 +93,7 @@ function App(props: any) {
           ariaLabel="Select a date"
           value={maxDate ? addDays(maxDate, 1) : undefined}
           minDate={minDate}
-          allowTextInput
+          {...(mobileDevice ? { allowTextInput: false } : { allowTextInput: true })}
           onSelectDate={setMaxDateHandler}
           strings={strings}
         />
